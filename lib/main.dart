@@ -8,9 +8,13 @@ import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:http/http.dart' as http;
 
-var data;
-
-
+String? res;
+Future<String> loadJson() async{
+  var url = Uri.parse('https://gix12724dc.execute-api.us-east-1.amazonaws.com/radiouno');
+  var response = await http.get(url);
+  var data = jsonDecode(response.body);
+  return data['url'];
+}
 
 
 // You might want to provide this using dependency injection rather than a
@@ -18,6 +22,7 @@ var data;
 late AudioHandler _audioHandler;
 
 Future<void> main() async {
+  res = await loadJson();
   _audioHandler = await AudioService.init(
     builder: () => AudioPlayerHandler(),
     config: const AudioServiceConfig(
@@ -37,23 +42,21 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Audio Service Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const MainScreen(),
+      home: const Principal(),
     );
   }
 }
 
-class MainScreen extends StatelessWidget {
-  const MainScreen({Key? key}) : super(key: key);
+class Principal extends StatefulWidget {
+  const Principal({Key? key}) : super(key: key);
 
   @override
+  State<Principal> createState() => _PrincipalState();
+}
+
+class _PrincipalState extends State<Principal> {
+  @override
   Widget build(BuildContext context) {
-    Future loadJson() async {
-      var url = Uri.http('https://jsonplaceholder.typicode.com/todos/1', '');
-      data = await http.get(url);
-      print(data);
-      return json.decode(data);
-    }
-    print('hola mundo');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Audio Service Demo'),
@@ -123,8 +126,6 @@ class MainScreen extends StatelessWidget {
     );
   }
 
-  /// A stream reporting the combined state of the current media item and its
-  /// current position.
   Stream<MediaState> get _mediaStateStream =>
       Rx.combineLatest2<MediaItem?, Duration, MediaState>(
           _audioHandler.mediaItem,
@@ -138,6 +139,7 @@ class MainScreen extends StatelessWidget {
   );
 }
 
+
 class MediaState {
   final MediaItem? mediaItem;
   final Duration position;
@@ -147,14 +149,14 @@ class MediaState {
 
 /// An [AudioHandler] for playing a single item.
 class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
+
   static final _item = MediaItem(
-    id: 'https://stream2.eistreaming.com:10995/;',
+    id: "${res}",
     album: "Science Friday",
     title: "A Salute To Head-Scratching Science",
     artist: "Science Friday and WNYC Studios",
     duration: const Duration(milliseconds: 5739820),
-    artUri: Uri.parse(
-        'https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
+    artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
   );
 
   final _player = AudioPlayer();
