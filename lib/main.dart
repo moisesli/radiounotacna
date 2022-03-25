@@ -40,8 +40,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Audio Service Demo',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      title: 'Radio Uno',
+      theme: ThemeData(primarySwatch: Colors.green),
       home: const Principal(),
     );
   }
@@ -59,69 +59,69 @@ class _PrincipalState extends State<Principal> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Audio Service Demo'),
+        title: const Text('Radio Uno'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Show media item title
-            StreamBuilder<MediaItem?>(
-              stream: _audioHandler.mediaItem,
-              builder: (context, snapshot) {
-                final mediaItem = snapshot.data;
-                return Text(mediaItem?.title ?? '');
-              },
-            ),
-            // Play/pause/stop buttons.
-            StreamBuilder<bool>(
-              stream: _audioHandler.playbackState
-                  .map((state) => state.playing)
-                  .distinct(),
-              builder: (context, snapshot) {
-                final playing = snapshot.data ?? false;
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _button(Icons.fast_rewind, _audioHandler.rewind),
-                    if (playing)
-                      _button(Icons.pause, _audioHandler.pause)
-                    else
-                      _button(Icons.play_arrow, _audioHandler.play),
-                    _button(Icons.stop, _audioHandler.stop),
-                    _button(Icons.fast_forward, _audioHandler.fastForward),
-                  ],
-                );
-              },
-            ),
-            // A seek bar.
-            StreamBuilder<MediaState>(
-              stream: _mediaStateStream,
-              builder: (context, snapshot) {
-                final mediaState = snapshot.data;
-                return SeekBar(
-                  duration: mediaState?.mediaItem?.duration ?? Duration.zero,
-                  position: mediaState?.position ?? Duration.zero,
-                  onChangeEnd: (newPosition) {
-                    _audioHandler.seek(newPosition);
-                  },
-                );
-              },
-            ),
-            // Display the processing state.
-            StreamBuilder<AudioProcessingState>(
-              stream: _audioHandler.playbackState
-                  .map((state) => state.processingState)
-                  .distinct(),
-              builder: (context, snapshot) {
-                final processingState =
-                    snapshot.data ?? AudioProcessingState.idle;
-                return Text(
-                    "Processing state: ${describeEnum(processingState)}");
-              },
-            ),
-          ],
-        ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          // Show media item title
+          StreamBuilder<MediaItem?>(
+            stream: _audioHandler.mediaItem,
+            builder: (context, snapshot) {
+              final mediaItem = snapshot.data;
+              return Text(mediaItem?.title ?? '');
+            },
+          ),
+          // Play/pause/stop buttons.
+          StreamBuilder<bool>(
+            stream: _audioHandler.playbackState.map((state) => state.playing).distinct(),
+            builder: (context, snapshot) {
+              final playing = snapshot.data ?? false;
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Image.asset('assets/img/radiouno2.png'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (playing)
+                        _button(Icons.pause, _audioHandler.pause)
+                      else
+                        _button(Icons.play_arrow, _audioHandler .play),
+                      _button(Icons.stop, _audioHandler.stop),
+                    ],
+                  ),
+                ],
+              );
+            },
+          ),
+          // A seek bar.
+          StreamBuilder<MediaState>(
+            stream: _mediaStateStream,
+            builder: (context, snapshot) {
+              final mediaState = snapshot.data;
+              return SeekBar(
+                duration: mediaState?.mediaItem?.duration ?? Duration.zero,
+                position: mediaState?.position ?? Duration.zero,
+                onChangeEnd: (newPosition) {
+                  _audioHandler.seek(newPosition);
+                },
+              );
+            },
+          ),
+          // Display the processing state.
+          StreamBuilder<AudioProcessingState>(
+            stream: _audioHandler.playbackState
+                .map((state) => state.processingState)
+                .distinct(),
+            builder: (context, snapshot) {
+              final processingState =
+                  snapshot.data ?? AudioProcessingState.idle;
+              return Text(
+                  "Processing state: ${describeEnum(processingState)}");
+            },
+          ),
+        ],
       ),
     );
   }
@@ -153,7 +153,7 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   static final _item = MediaItem(
     id: "${res}",
     album: "Science Friday",
-    title: "A Salute To Head-Scratching Science",
+    title: "Peru Tacna - Radio Uno",
     artist: "Science Friday and WNYC Studios",
     duration: const Duration(milliseconds: 5739820),
     artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
