@@ -59,17 +59,17 @@ class _PrincipalState extends State<Principal> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Radio Uno'),
+        title: const Text('Radio Uno Tacna - Peru'),
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Show media item title
           StreamBuilder<MediaItem?>(
             stream: _audioHandler.mediaItem,
             builder: (context, snapshot) {
               final mediaItem = snapshot.data;
-              return Text(mediaItem?.title ?? '');
+              return Text(mediaItem?.title ?? '', style: TextStyle(fontSize: 19),);
             },
           ),
           // Play/pause/stop buttons.
@@ -80,7 +80,10 @@ class _PrincipalState extends State<Principal> {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Image.asset('assets/img/radiouno2.png'),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                  ),
+                  Image.asset('assets/img/radiouno.jpg'),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -121,6 +124,9 @@ class _PrincipalState extends State<Principal> {
                   "Processing state: ${describeEnum(processingState)}");
             },
           ),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+          ),
         ],
       ),
     );
@@ -134,7 +140,8 @@ class _PrincipalState extends State<Principal> {
 
   IconButton _button(IconData iconData, VoidCallback onPressed) => IconButton(
     icon: Icon(iconData),
-    iconSize: 64.0,
+    iconSize: 90.0,
+    color: Colors.green,
     onPressed: onPressed,
   );
 }
@@ -152,11 +159,11 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
 
   static final _item = MediaItem(
     id: "${res}",
-    album: "Science Friday",
-    title: "Peru Tacna - Radio Uno",
-    artist: "Science Friday and WNYC Studios",
+    album: "Lineysoft",
+    title: "Radio Uno Tacna",
+    artist: "El Sonido de la Patria",
     duration: const Duration(milliseconds: 5739820),
-    artUri: Uri.parse('https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
+    artUri: Uri.parse('https://pwaapk.s3.amazonaws.com/radiouno.jpg'),
   );
 
   final _player = AudioPlayer();
