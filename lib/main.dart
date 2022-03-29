@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:radiounotacna/common.dart';
 import 'package:flutter/foundation.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:http/http.dart' as http;
+import 'package:radiounotacna/banner.dart';
 
 String? res;
 Future<String> loadJson() async{
@@ -22,6 +24,8 @@ Future<String> loadJson() async{
 late AudioHandler _audioHandler;
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   res = await loadJson();
   _audioHandler = await AudioService.init(
     builder: () => AudioPlayerHandler(),
@@ -55,6 +59,13 @@ class Principal extends StatefulWidget {
 }
 
 class _PrincipalState extends State<Principal> {
+
+  @override
+  void initState() {
+    super.initState();
+    myBanner.load();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,69 +75,75 @@ class _PrincipalState extends State<Principal> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Show media item title
-          StreamBuilder<MediaItem?>(
-            stream: _audioHandler.mediaItem,
-            builder: (context, snapshot) {
-              final mediaItem = snapshot.data;
-              return Text(mediaItem?.title ?? '', style: TextStyle(fontSize: 19),);
-            },
-          ),
-          // Play/pause/stop buttons.
-          StreamBuilder<bool>(
-            stream: _audioHandler.playbackState.map((state) => state.playing).distinct(),
-            builder: (context, snapshot) {
-              final playing = snapshot.data ?? false;
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                  ),
-                  Image.asset('assets/img/radiouno.jpg'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (playing)
-                        _button(Icons.pause, _audioHandler.pause)
-                      else
-                        _button(Icons.play_arrow, _audioHandler .play),
-                      _button(Icons.stop, _audioHandler.stop),
-                    ],
-                  ),
-                ],
-              );
-            },
-          ),
-          // A seek bar.
-          StreamBuilder<MediaState>(
-            stream: _mediaStateStream,
-            builder: (context, snapshot) {
-              final mediaState = snapshot.data;
-              return SeekBar(
-                duration: mediaState?.mediaItem?.duration ?? Duration.zero,
-                position: mediaState?.position ?? Duration.zero,
-                onChangeEnd: (newPosition) {
-                  _audioHandler.seek(newPosition);
+          Expanded(child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+
+            children: [
+              Text('Lineysoft inc.'),
+              /*
+              StreamBuilder<MediaItem?>(
+                stream: _audioHandler.mediaItem,
+                builder: (context, snapshot) {
+                  final mediaItem = snapshot.data;
+                  return Text(mediaItem?.title ?? '', style: TextStyle(fontSize: 19),);
                 },
-              );
-            },
-          ),
-          // Display the processing state.
-          StreamBuilder<AudioProcessingState>(
-            stream: _audioHandler.playbackState
-                .map((state) => state.processingState)
-                .distinct(),
-            builder: (context, snapshot) {
-              final processingState =
-                  snapshot.data ?? AudioProcessingState.idle;
-              return Text(
-                  "Processing state: ${describeEnum(processingState)}");
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-          ),
+              ),
+               */
+              // Play/pause/stop buttons.
+              StreamBuilder<bool>(
+                stream: _audioHandler.playbackState.map((state) => state.playing).distinct(),
+                builder: (context, snapshot) {
+                  final playing = snapshot.data ?? false;
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(5.0),
+                      ),
+                      Image.asset('assets/img/radiouno.jpg'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (playing)
+                            _button(Icons.pause, _audioHandler.pause)
+                          else
+                            _button(Icons.play_arrow, _audioHandler .play),
+                          _button(Icons.stop, _audioHandler.stop),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
+              // A seek bar.
+              StreamBuilder<MediaState>(
+                stream: _mediaStateStream,
+                builder: (context, snapshot) {
+                  final mediaState = snapshot.data;
+                  return SeekBar(
+                    duration: mediaState?.mediaItem?.duration ?? Duration.zero,
+                    position: mediaState?.position ?? Duration.zero,
+                    onChangeEnd: (newPosition) {
+                      _audioHandler.seek(newPosition);
+                    },
+                  );
+                },
+              ),
+              // Display the processing state.
+              StreamBuilder<AudioProcessingState>(
+                stream: _audioHandler.playbackState
+                    .map((state) => state.processingState)
+                    .distinct(),
+                builder: (context, snapshot) {
+                  final processingState =
+                      snapshot.data ?? AudioProcessingState.idle;
+                  return Text(
+                      "Reproduciendo: ${describeEnum(processingState)}");
+                },
+              ),
+            ],
+          )),
+          Center(child: adContainer)
         ],
       ),
     );
