@@ -21,7 +21,7 @@ final BannerAdListener listener = BannerAdListener(
 );
 
 final BannerAd myBanner = BannerAd(
-  adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+  adUnitId: 'ca-app-pub-5852042324891789/8523087733',
   size: AdSize.banner,
   request: AdRequest(),
   listener: BannerAdListener(),
